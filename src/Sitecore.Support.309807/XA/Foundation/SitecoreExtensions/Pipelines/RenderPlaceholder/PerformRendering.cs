@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Sitecore.Caching;
 using Sitecore.Configuration;
+using Sitecore.Data;
 using Sitecore.Mvc.Pipelines.Response.RenderPlaceholder;
 using Sitecore.Mvc.Presentation;
 
@@ -17,14 +18,14 @@ namespace Sitecore.Support.XA.Foundation.SitecoreExtensions.Pipelines.RenderPlac
       {
       }
 
-      public virtual void Set(Guid renderingUniqueId, Renderer renderer)
+      public virtual void Set(ID renderingItemId, Renderer renderer)
       {
-        SetObject(renderingUniqueId.ToString(), renderer);
+        SetObject(renderingItemId.ToString(), renderer);
       }
 
-      public virtual Renderer Get(Guid renderingUniqueId)
+      public virtual Renderer Get(ID renderingItemId)
       {
-        return GetObject(renderingUniqueId.ToString()) as Renderer;
+        return GetObject(renderingItemId.ToString()) as Renderer;
       }
     }
     protected override IEnumerable<Rendering> GetRenderings(string placeholderName, RenderPlaceholderArgs args)
@@ -34,11 +35,11 @@ namespace Sitecore.Support.XA.Foundation.SitecoreExtensions.Pipelines.RenderPlac
       {
         foreach (var rendering in renderings)
         {
-          var renderer = RenderersCache.Get(rendering.UniqueId);
+          var renderer = RenderersCache.Get(rendering.RenderingItem.ID);
           if (renderer == null)
           {
             renderer = rendering.Renderer;
-            RenderersCache.Set(rendering.UniqueId, renderer);
+            RenderersCache.Set(rendering.RenderingItem.ID, renderer);
           }
 
           rendering.Renderer = renderer;

@@ -3,6 +3,7 @@ using Sitecore.Caching;
 using Sitecore.Configuration;
 using Sitecore.Mvc.Presentation;
 using Sitecore.Pipelines;
+using Sitecore.StringExtensions;
 using Sitecore.XA.Foundation.Presentation.Pipelines.GetRenderingCaching;
 using Sitecore.XA.Foundation.Presentation.Services;
 
@@ -18,20 +19,21 @@ namespace Sitecore.Support.XA.Foundation.Presentation.Services
       {
       }
 
-      public virtual void Set(Guid renderingId, RenderingCachingDefinition value)
+      public virtual void Set(string key, RenderingCachingDefinition value)
       {
-        SetObject(renderingId.ToString(), value);
+        SetObject(key, value);
       }
 
-      public virtual RenderingCachingDefinition Get(Guid renderingId)
+      public virtual RenderingCachingDefinition Get(string key)
       {
-        return GetObject(renderingId.ToString()) as RenderingCachingDefinition;
+        return GetObject(key) as RenderingCachingDefinition;
       }
     }
 
     public RenderingCachingDefinition GetCachingDefinition(Rendering rendering)
     {
-      var entry = RenderingCacheOptions.Get(rendering.UniqueId);
+      string key = this.GenerateCacheKey(rendering);
+      var entry = RenderingCacheOptions.Get(key);
       if (entry != null)
       {
         return entry;
@@ -43,9 +45,13 @@ namespace Sitecore.Support.XA.Foundation.Presentation.Services
       };
       CorePipeline.Run("getRenderingCaching", getRenderingCachingArgs);
       RenderingCachingDefinition cachingDefinition = new RenderingCachingDefinition(getRenderingCachingArgs.Rendering);
-      RenderingCacheOptions.Set(rendering.UniqueId, cachingDefinition);
+      RenderingCacheOptions.Set(key, cachingDefinition);
 
       return cachingDefinition;
+    }
+    private string GenerateCacheKey(Rendering rendering)
+    {
+      return "{0}|{1}|{2}".FormatWith(rendering.Placeholder, rendering.UniqueId, rendering.RenderingItem.ID);
     }
   }
 }
