@@ -5,6 +5,7 @@ using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Mvc.Pipelines.Response.RenderPlaceholder;
 using Sitecore.Mvc.Presentation;
+using Sitecore.StringExtensions;
 
 namespace Sitecore.Support.XA.Foundation.SitecoreExtensions.Pipelines.RenderPlaceholder
 {
@@ -18,14 +19,14 @@ namespace Sitecore.Support.XA.Foundation.SitecoreExtensions.Pipelines.RenderPlac
       {
       }
 
-      public virtual void Set(ID renderingItemId, Renderer renderer)
+      public virtual void Set(string key, Renderer renderer)
       {
-        SetObject(renderingItemId.ToString(), renderer);
+        SetObject(key, renderer);
       }
 
-      public virtual Renderer Get(ID renderingItemId)
+      public virtual Renderer Get(string key)
       {
-        return GetObject(renderingItemId.ToString()) as Renderer;
+        return GetObject(key) as Renderer;
       }
     }
     protected override IEnumerable<Rendering> GetRenderings(string placeholderName, RenderPlaceholderArgs args)
@@ -35,11 +36,12 @@ namespace Sitecore.Support.XA.Foundation.SitecoreExtensions.Pipelines.RenderPlac
       {
         foreach (var rendering in renderings)
         {
-          var renderer = RenderersCache.Get(rendering.RenderingItem.ID);
+          string key = this.GenerateCacheKey(rendering);
+          var renderer = RenderersCache.Get(key);
           if (renderer == null)
           {
             renderer = rendering.Renderer;
-            RenderersCache.Set(rendering.RenderingItem.ID, renderer);
+            RenderersCache.Set(key, renderer);
           }
 
           rendering.Renderer = renderer;
@@ -47,6 +49,10 @@ namespace Sitecore.Support.XA.Foundation.SitecoreExtensions.Pipelines.RenderPlac
       }
 
       return renderings;
+    }
+    private string GenerateCacheKey(Rendering rendering)
+    {
+      return "{0}|{1}".FormatWith(rendering.UniqueId, rendering.RenderingItem.ID);
     }
   }
 }
