@@ -51,7 +51,7 @@ namespace Sitecore.Support.XA.Foundation.Presentation.Services
     }
     private string GenerateCacheKey(Rendering rendering)
     {
-      return "{0}|{1}|{2}".FormatWith(rendering.Placeholder, rendering.UniqueId, rendering.RenderingItem.ID);
+      return "{0}|{1}|{2}".FormatWith(rendering.Placeholder, rendering.UniqueId, rendering.RenderingItem?.ID);
     }
   }
 }

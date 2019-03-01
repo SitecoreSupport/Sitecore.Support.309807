@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Sitecore.Caching;
 using Sitecore.Configuration;
 using Sitecore.Data;
+using Sitecore.Diagnostics;
 using Sitecore.Mvc.Pipelines.Response.RenderPlaceholder;
 using Sitecore.Mvc.Presentation;
 using Sitecore.StringExtensions;
@@ -52,7 +53,8 @@ namespace Sitecore.Support.XA.Foundation.SitecoreExtensions.Pipelines.RenderPlac
     }
     private string GenerateCacheKey(Rendering rendering)
     {
-      return "{0}|{1}".FormatWith(rendering.UniqueId, rendering.RenderingItem.ID);
+
+      return "{0}|{1}".FormatWith(rendering.UniqueId, rendering.RenderingItem?.ID);
     }
   }
 }
