@@ -44,9 +44,9 @@ namespace Sitecore.Support.XA.Foundation.SitecoreExtensions.Pipelines.RenderPlac
           if (!string.IsNullOrEmpty(text))
           {
             var renderingReference = new RenderingReference(XElement.Parse(text).ToXmlNode(), Context.Language, args.PageContext.Database);
-            var rulesList = renderingReference.Settings.Rules;
             if (renderingReference.Settings != null)
             {
+              var rulesList = renderingReference.Settings.Rules;
               if (rulesList != null && rulesList.Count > 0)
               {
                 continue;
