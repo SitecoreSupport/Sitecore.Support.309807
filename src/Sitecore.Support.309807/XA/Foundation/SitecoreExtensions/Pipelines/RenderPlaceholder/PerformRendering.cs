@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 using Sitecore.Caching;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Diagnostics;
+using Sitecore.Layouts;
+using Sitecore.Mvc.Extensions;
 using Sitecore.Mvc.Pipelines.Response.RenderPlaceholder;
 using Sitecore.Mvc.Presentation;
 using Sitecore.StringExtensions;
@@ -37,6 +40,30 @@ namespace Sitecore.Support.XA.Foundation.SitecoreExtensions.Pipelines.RenderPlac
       {
         foreach (var rendering in renderings)
         {
+          string text = rendering.Properties["RenderingXml"];
+          if (!string.IsNullOrEmpty(text))
+          {
+            var renderingReference = new RenderingReference(XElement.Parse(text).ToXmlNode(), Context.Language, args.PageContext.Database);
+            var rulesList = renderingReference.Settings.Rules;
+            if (renderingReference.Settings != null)
+            {
+              if (rulesList != null && rulesList.Count > 0)
+              {
+                continue;
+              }
+
+              if (!string.IsNullOrEmpty(renderingReference.Settings.MultiVariateTest))
+              {
+                continue;
+              }
+
+              if (!string.IsNullOrEmpty(renderingReference.Settings.PersonalizationTest) &&
+                  !ID.IsNullOrEmpty(ID.Parse(renderingReference.Settings.PersonalizationTest)))
+              {
+                continue;
+              }
+            }
+          }
           string key = this.GenerateCacheKey(rendering);
           var renderer = RenderersCache.Get(key);
           if (renderer == null)
