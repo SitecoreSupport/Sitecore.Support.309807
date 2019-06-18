@@ -46,6 +46,10 @@ namespace Sitecore.Support.XA.Foundation.SitecoreExtensions.Pipelines.RenderPlac
             var renderingReference = new RenderingReference(XElement.Parse(text).ToXmlNode(), Context.Language, args.PageContext.Database);
             if (renderingReference.Settings != null)
             {
+              if (!rendering.Caching.Cacheable)
+              {
+                continue;
+              }
               var rulesList = renderingReference.Settings.Rules;
               if (rulesList != null && rulesList.Count > 0)
               {
