@@ -21,12 +21,19 @@ namespace Sitecore.Support.XA.Foundation.Presentation.Services
 
       public virtual void Set(string key, RenderingCachingDefinition value)
       {
-        SetObject(key, value);
+        if (value == null)
+        {
+          SetObject(key, new object()); 
+        }
+        else
+        {
+          SetObject(key, value);
+        }
       }
 
-      public virtual RenderingCachingDefinition Get(string key)
+      public virtual object Get(string key)
       {
-        return GetObject(key) as RenderingCachingDefinition;
+        return GetObject(key);
       }
     }
 
@@ -36,7 +43,7 @@ namespace Sitecore.Support.XA.Foundation.Presentation.Services
       var entry = RenderingCacheOptions.Get(key);
       if (entry != null)
       {
-        return entry;
+        return entry as RenderingCachingDefinition;
       }
 
       GetRenderingCachingArgs getRenderingCachingArgs = new GetRenderingCachingArgs
@@ -44,11 +51,12 @@ namespace Sitecore.Support.XA.Foundation.Presentation.Services
         Rendering = rendering
       };
       CorePipeline.Run("getRenderingCaching", getRenderingCachingArgs);
-      RenderingCachingDefinition cachingDefinition = new RenderingCachingDefinition(getRenderingCachingArgs.Rendering);
-      RenderingCacheOptions.Set(key, cachingDefinition);
 
-      return cachingDefinition;
+      RenderingCacheOptions.Set(key, getRenderingCachingArgs.CachingDefinition);
+
+      return getRenderingCachingArgs.CachingDefinition;
     }
+
     private string GenerateCacheKey(Rendering rendering)
     {
       return "{0}|{1}|{2}".FormatWith(rendering.Placeholder, rendering.UniqueId, rendering.RenderingItem?.ID);
